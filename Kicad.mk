@@ -67,7 +67,7 @@ SUB_FOLDERS = $(SCH_FOLDER) $(PCB_FOLDER) $(GERBER_FOLDER) $(DRILL_FOLDER) $(POS
 ## CMDS
 # Path to kicad-cli
 ifndef KICAD_CMD
-	ifeq ($(CURRENT_OS),Linux)
+	ifeq ($(CURRENT_OS),LINUX)
 		KICAD_CMD = kicad-cli
 	else
 		KICAD_CMD = /Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli
@@ -223,7 +223,7 @@ ifeq ($(KICADMK_PRINT_LOG),1)
 	$(call shell_output,$(subst $(newline),\n\,$(LOG_CONTENT)))
 endif
 
-.PHONY: all clean clean-dist clean-prod prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech
+.PHONY: all clean clean-dist clean-prod prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech image
 
 all: prod dist
 
@@ -246,6 +246,9 @@ pos: $(POS_FILES)
 mech: $(MECH_FILES)
 net: $(SCH_FOLDER)/$(PROJECT_NAME).net
 gerbers: $(GERBER_TARGET_FILES) | $(GERBER_FOLDER)
+
+image: $(KICADMK_DIR)/Dockerfile
+	docker build --tag kicad-makefile:latest --label kicad-makefile $(KICADMK_DIR)/.
 
 clean:
 	$(RM) $(OUTPUT_FOLDER)
