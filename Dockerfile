@@ -1,4 +1,6 @@
 FROM ubuntu:latest
+MAINTAINER John Whittington <git@jbrengineering.co.uk>
+LABEL Description="KiCad 7.0 with KiCad Makefile and plugins used"
 
 RUN apt update && \
       apt upgrade -y && \
