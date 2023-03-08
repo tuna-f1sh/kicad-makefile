@@ -13,10 +13,14 @@ PROJECT_ROOT = .
 # KICADMK_INCLUDE_LOG = 1
 # Define and set to 1 to print the log content at start to shell
 # KICADMK_PRINT_LOG = 0
+# Set to 1 to generate separated pdf and/or svg with pcb files
+# PCB_SEPARATE_PDF = 1
+# PCB_SEPARATE_SVG = 1
 
 # Define a command that generates a BoM - kibom installed with pip by default but could be path to Python script
-# BOM_CMD = python3 -m kibom
-# BOM_CMD = python3 ~/KiBoM/KiBOM_CLI.py
+# ?= a good idea so that a CI and override this with a env
+# BOM_CMD ?= python3 -m kibom
+# BOM_CMD ?= python3 ~/KiBoM/KiBOM_CLI.py
 # KiBoM by default creates output with _bom_REV.csv appended, pass a config file to it to match target BoM name
 # BOM_CMD_FLAGS = --cfg $(PROJECT_ROOT)/bom.ini
 

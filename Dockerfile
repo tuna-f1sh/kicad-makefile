@@ -4,7 +4,7 @@ LABEL Description="KiCad 7.0 with KiCad Makefile and plugins used"
 
 RUN apt update && \
       apt upgrade -y && \
-      apt install -y wget make zip git python3 python3-pip && \
+      apt install -y wget make zip git python3 python3-pip poppler-utils && \
       apt autoclean -y && \
       apt autoremove -y && \
       apt clean

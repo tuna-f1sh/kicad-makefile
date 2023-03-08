@@ -19,10 +19,13 @@
 # KICADMK_INCLUDE_LOG = 0
 # Print the log content at start to shell
 # KICADMK_PRINT_LOG = 1
+# Set to 1 to generate separated pdf and/or svg with pcb files
+# PCB_SEPARATE_PDF = 1
+# PCB_SEPARATE_SVG = 1
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 0.1-aplha
+override KICADMK_VER = 0.2-aplha
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -90,7 +93,13 @@ ZIP = zip
 
 # LAYERS
 
+# for main pdf and svg target
 PCB_DRAWING_LAYERS ?= "F.Cu,B.Cu,Edge.Cuts,Dwgs.User"
+# for separated pdf and svg targets
+PCB_COPPER_LAYERS ?= "F.Cu,B.Cu"
+PCB_SEPARATE_PDF ?= 0
+PCB_SEPARATE_SVG ?= 0
+# for dxf
 DXF_LAYERS ?= "Edge.Cuts,Dwgs.User,Cmts.User,Eco1.User,Eco2.User,F.Fab,B.Fab"
 # GERBER_LAYERS = "F.Cu,B.Cu" # can be defined
 
@@ -104,10 +113,10 @@ DXF_LAYERS ?= "Edge.Cuts,Dwgs.User,Cmts.User,Eco1.User,Eco2.User,F.Fab,B.Fab"
 # DRILL_FLAGS +=
 # POS_FLAGS +=
 DXF_FLAGS += --layers $(DXF_LAYERS)
-PCB_PDF_FLAGS += --layers $(PCB_DRAWING_LAYERS)
-PCB_SVG_FLAGS += --layers $(PCB_DRAWING_LAYERS)
+# PCB_PDF_FLAGS +=
+# PCB_SVG_FLAGS +=
 # flags for zip archives
-ZIP_FLAGS += -x \*.zip -x \*.ini -x \*.xml
+ZIP_FLAGS += -x \*.zip \*.ini \*.xml $(DIST_FOLDER)\* $(PROD_FOLDER)\*
 
 ifneq ($(call dir_if_exists,$(PROJECT_ROOT)/.git),)
 		GIT_DESCRIBE := $(call git_tag_ver)
@@ -118,12 +127,18 @@ BOM_FILENAME ?= $(PROJECT_NAME).csv
 DRILL_FILENAMES ?= $(PROJECT_NAME).drl
 POS_FILENAMES ?= $(PROJECT_NAME)-both.pos $(PROJECT_NAME)-top.pos $(PROJECT_NAME)-bottom.pos
 
-ifneq ($(REVISION),)
-DIST_BASE_FILENAME ?= $(PROJECT_NAME)-$(REVISION)
-PROD_BASE_FILENAME ?= $(PROJECT_NAME)-$(REVISION)
-else
 DIST_BASE_FILENAME ?= $(PROJECT_NAME)
 PROD_BASE_FILENAME ?= $(PROJECT_NAME)
+
+ifneq ($(VARIANT),)
+	DIST_BASE_FILENAME := $(DIST_BASE_FILENAME)-$(VARIANT)
+	PROD_BASE_FILENAME := $(PROD_BASE_FILENAME)-$(VARIANT)
+endif
+
+
+ifneq ($(REVISION),)
+	DIST_BASE_FILENAME := $(DIST_BASE_FILENAME)-$(REVISION)
+	PROD_BASE_FILENAME := $(PROD_BASE_FILENAME)-$(REVISION)
 endif
 
 ifeq ($(KICADMK_APPEND_GIT),1)
@@ -136,6 +151,11 @@ endif
 ifeq ($(KICADMK_INCLUDE_LOG),1)
 	LOG_FILE = $(OUTPUT_FOLDER)/$(DIST_BASE_FILENAME)-job.log
 endif
+
+# builds a list of copper layers to build pdf files of for merged pdf
+PCB_COPPER_LAYERS_SPLIT = $(shell echo $(PCB_COPPER_LAYERS) | sed 's/,/ /g')
+PCB_PDF_COPPER_FILES := $(foreach layer,$(PCB_COPPER_LAYERS_SPLIT),$(PCB_FOLDER)/$(PROJECT_NAME)-$(subst .,_,$(layer)).layer.pdf)
+PCB_SVG_COPPER_FILES := $(foreach layer,$(PCB_COPPER_LAYERS_SPLIT),$(PCB_FOLDER)/$(PROJECT_NAME)-$(subst .,_,$(layer)).layer.svg)
 
 # if gerber layers defined, generate based on these
 ifdef GERBER_LAYERS
@@ -157,6 +177,8 @@ endif
 BOM_FILE = $(BOM_FOLDER)/$(BOM_FILENAME) $(LOG_FILE)
 DRILL_FILES = $(foreach filename,$(DRILL_FILENAMES),$(DRILL_FOLDER)/$(filename)) $(LOG_FILE)
 POS_FILES = $(foreach filename,$(POS_FILENAMES),$(POS_FOLDER)/$(filename)) $(LOG_FILE)
+PDF_FILENAME ?= $(DIST_BASE_FILENAME).pdf
+PDF_FILE = $(OUTPUT_FOLDER)/$(PDF_FILENAME)
 
 DIST_ZIP_FILE_NAME = $(DIST_BASE_FILENAME).zip
 PRODUCTION_ALL_ZIP_FILE_NAME = $(PROD_BASE_FILENAME)-prod.zip
@@ -176,6 +198,12 @@ SCH_FILES = $(SCH_FOLDER)/$(PROJECT_NAME).pdf $(SCH_FOLDER)/$(PROJECT_NAME).svg 
 SCH_ZIP_FILE_NAME = $(DIST_BASE_FILENAME)-sch.zip
 
 PCB_FILES = $(MECH_FILES) $(PCB_FOLDER)/$(PROJECT_NAME).pdf $(PCB_FOLDER)/$(PROJECT_NAME).svg $(LOG_FILE)
+ifeq ($(PCB_SEPARATE_PDF),1)
+	PCB_FILES += $(PCB_PDF_COPPER_FILES)
+endif
+ifeq ($(PCB_SEPARATE_SVG),1)
+	PCB_FILES += $(PCB_SVG_COPPER_FILES)
+endif
 PCB_ZIP_FILE_NAME = $(DIST_BASE_FILENAME)-pcb.zip
 
 REF_FILES = $(SCH_FILES) $(PCB_FILES)
@@ -198,6 +226,7 @@ $(call config_variable,PYTHON_BOM_FLAGS,-,1)
 $(call config_variable,PDF_FLAGS,-,1)
 $(call config_variable,SVG_FLAGS,-,1)
 ## PCB
+$(call config_variable,PCB_COPPER_LAYERS,-,1)
 $(call config_variable,PCB_DRAWING_LAYERS,-,1)
 $(call config_variable,DXF_LAYERS,-,1)
 $(call config_variable,DXF_FLAGS,-,1)
@@ -223,7 +252,7 @@ ifeq ($(KICADMK_PRINT_LOG),1)
 	$(call shell_output,$(subst $(newline),\n\,$(LOG_CONTENT)))
 endif
 
-.PHONY: all clean clean-dist clean-prod prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech image
+.PHONY: all clean clean-dist clean-prod prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech image pdf
 
 all: prod dist
 
@@ -246,6 +275,7 @@ pos: $(POS_FILES)
 mech: $(MECH_FILES)
 net: $(SCH_FOLDER)/$(PROJECT_NAME).net
 gerbers: $(GERBER_TARGET_FILES) | $(GERBER_FOLDER)
+pdf: $(PDF_FILE)
 
 image: $(KICADMK_DIR)/Dockerfile
 	docker build --tag kicad-makefile:latest --label kicad-makefile $(KICADMK_DIR)/.
@@ -276,12 +306,18 @@ $(SCH_FOLDER)/%.svg: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
 
 $(PCB_FOLDER)/%.step: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
 	$(KICAD_CMD) pcb export step -o $@ $< 
+	
+$(PCB_FOLDER)/%.layer.pdf: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
+	$(KICAD_CMD) pcb export pdf $(PCB_PDF_FLAGS) --layers $(basename $(shell echo ‘$(@F)’ | $(GREP) -Eo "(\w+?_\w+?)\.\w+" | sed 's/_/./g')) -o $@ $<
 
 $(PCB_FOLDER)/%.pdf: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
-	$(KICAD_CMD) pcb export pdf $(PCB_PDF_FLAGS) -o $@ $<
+	$(KICAD_CMD) pcb export pdf $(PCB_PDF_FLAGS) --layers $(PCB_DRAWING_LAYERS) -o $@ $<
+	
+$(PCB_FOLDER)/%.layer.svg: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
+	$(KICAD_CMD) pcb export svg $(PCB_SVG_FLAGS) --layers $(basename $(shell echo ‘$(@F)’ | $(GREP) -Eo "(\w+?_\w+?)\.\w+" | sed 's/_/./g')) -o $@ $<
 
 $(PCB_FOLDER)/%.svg: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
-	$(KICAD_CMD) pcb export svg $(PCB_SVG_FLAGS) -o $@ $<
+	$(KICAD_CMD) pcb export svg $(PCB_SVG_FLAGS) --layers $(PCB_DRAWING_LAYERS) -o $@ $<
 
 $(PCB_FOLDER)/%.dxf: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
 	$(KICAD_CMD) pcb export dxf $(DXF_FLAGS) -o $@ $<
@@ -338,8 +374,11 @@ $(DIST_FOLDER)/$(PCB_ZIP_FILE_NAME): $(PCB_FILES) | $(DIST_FOLDER)
 $(DIST_FOLDER)/$(REF_ZIP_FILE_NAME): $(REF_FILES) | $(DIST_FOLDER)
 	$(ZIP) $(ZIP_FLAGS) -j $@ $?
 
-$(DIST_FOLDER)/$(DIST_ZIP_FILE_NAME): $(BOM_FILE) $(DRILL_FILES) $(POS_FILES) $(GERBER_TARGET_FILES) $(PCB_FILES) $(SCH_FILES) | $(DIST_FOLDER)
+$(DIST_FOLDER)/$(DIST_ZIP_FILE_NAME): $(BOM_FILE) $(DRILL_FILES) $(POS_FILES) $(GERBER_TARGET_FILES) $(PCB_FILES) $(SCH_FILES) $(PDF_FILE) | $(DIST_FOLDER)
 	$(ZIP) $@ -r $(OUTPUT_FOLDER) $(ZIP_FLAGS)
+
+$(OUTPUT_FOLDER)/%.pdf: $(SCH_FOLDER)/$(PROJECT_NAME).pdf $(PCB_PDF_COPPER_FILES)
+	pdfunite $^ $@
 
 $(OUTPUT_FOLDER):
 	$(MKDIR) $@
