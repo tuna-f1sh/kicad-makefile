@@ -18,9 +18,6 @@ RUN add-apt-repository --yes ppa:kicad/kicad-7.0-releases && \
 # Install KiCad 7.0
 RUN apt update && apt install kicad -y
 
-# Ensure git is happy running in mount
-RUN git config --global --add safe.directory /builds
-
 # Copy kicad-makefile and export environment location
 COPY . kicad-makefile/
 ENV KICADMK_DIR=/kicad-makefile
@@ -37,5 +34,8 @@ ENV KICADMK_DOCKER=1
 
 # Make the workdir mount
 RUN mkdir project/
+
+# Ensure git is happy running in mount
+RUN git config --global --add safe.directory /project
 
 WORKDIR project/

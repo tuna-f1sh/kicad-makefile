@@ -25,7 +25,7 @@
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 0.2-aplha
+override KICADMK_VER = 0.3-aplha
 
 shell_output =
 KICADMK_QUIET ?= 0
