@@ -65,19 +65,19 @@ BOM_FOLDER = $(OUTPUT_FOLDER)/bom
 SUB_FOLDERS = $(SCH_FOLDER) $(PCB_FOLDER) $(GERBER_FOLDER) $(DRILL_FOLDER) $(POS_FOLDER) $(BOM_FOLDER)
 
 ## CMDS
-# Path to kicad-cli
+# Path to kicad-cli if not defined
 ifndef KICAD_CMD
-	ifeq ($(CURRENT_OS),LINUX)
-		KICAD_CMD = kicad-cli
-	else
+	ifeq ($(CURRENT_OS),WINDOWS)
+		$(error KICAD_CMD cannot be detected and must be defined)
+	endif
+	ifeq ($(CURRENT_OS),MAC)
 		KICAD_CMD = /Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli
+	else
+		KICAD_CMD = kicad-cli
 	endif
 endif
-ifeq ($(KICAD_CMD),)
-	$(error KICAD_CMD cannot be detected and must be defined)
-endif
 KICAD_VERSION := $(shell $(KICAD_CMD) version)
-BOM_CMD ?= kibom
+BOM_CMD ?= python3 -m kibom
 BOM_CMD_FLAGS +=
 
 GREP ?= grep

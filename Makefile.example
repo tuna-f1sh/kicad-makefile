@@ -14,8 +14,9 @@ PROJECT_ROOT = .
 # Define and set to 1 to print the log content at start to shell
 # KICADMK_PRINT_LOG = 0
 
-# Define a command that generates a BoM
-# BOM_CMD ?= kibom
+# Define a command that generates a BoM - kibom installed with pip by default but could be path to Python script
+# BOM_CMD = python3 -m kibom
+# BOM_CMD = python3 ~/KiBoM/KiBOM_CLI.py
 # KiBoM by default creates output with _bom_REV.csv appended, pass a config file to it to match target BoM name
 # BOM_CMD_FLAGS = --cfg $(PROJECT_ROOT)/bom.ini
 
