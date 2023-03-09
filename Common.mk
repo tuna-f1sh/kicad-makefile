@@ -30,8 +30,8 @@ config_variable = $(call config_info,$(1) = $($(1)),$(2),$(3))
 show_separator = $(call shell_output,-------------------------)
 
 # Git tag-revsions-hash
-git_tag_ver = $(shell git describe --abbrev=4 --always --tags --long)
-git_commit = $(shell git describe --abbrev=5 --always --long)
+git_tag_ver = $(shell git describe --abbrev=4 --always --tags --long 2>/dev/null)
+git_commit = $(shell git describe --abbrev=5 --always --long 2>/dev/null)
 
 # Printing defines
 define newline

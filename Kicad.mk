@@ -22,10 +22,19 @@
 # Set to 1 to generate separated pdf and/or svg with pcb files
 # PCB_SEPARATE_PDF = 1
 # PCB_SEPARATE_SVG = 1
+# Define the PCB copper layers
+# PCB_COPPER_LAYERS = "F.Cu,B.Cu"
+#
+# Define a command that generates a BoM - kibom installed with pip by default but could be path to Python script
+# ?= a good idea so that a CI and override this with a env
+# BOM_CMD ?= python3 -m kibom
+# BOM_CMD ?= python3 ~/KiBoM/KiBOM_CLI.py
+# KiBoM by default creates output with _bom_REV.csv appended, pass a config file to it to match target BoM name
+# BOM_CMD_FLAGS = --cfg $(PROJECT_ROOT)/bom.ini
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 0.3-aplha
+override KICADMK_VER = 0.4-aplha
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -123,7 +132,7 @@ ifneq ($(call dir_if_exists,$(PROJECT_ROOT)/.git),)
 endif
 
 ## FILES
-BOM_FILENAME ?= $(PROJECT_NAME).csv
+BOM_FILENAME ?= $(PROJECT_NAME).csv # if using KiBOM this should be configured in the bom.ini to match to avoid re-build
 DRILL_FILENAMES ?= $(PROJECT_NAME).drl
 POS_FILENAMES ?= $(PROJECT_NAME)-both.pos $(PROJECT_NAME)-top.pos $(PROJECT_NAME)-bottom.pos
 
@@ -293,6 +302,10 @@ $(BOM_FOLDER)/%.xml: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(BOM_FOLDER)
 	$(KICAD_CMD) sch export python-bom $(PYTHON_BOM_FLAGS) -o $@ $<
 
 $(BOM_FOLDER)/%.csv: $(BOM_FOLDER)/%.xml | $(BOM_FOLDER)
+	# remove any existing since target might not match
+ifneq ($(wildcard $(BOM_FOLDER)/*.csv),)
+	rm $(BOM_FOLDER)/*.csv
+endif
 	$(BOM_CMD) $(BOM_CMD_FLAGS) $< $@ 
 
 $(SCH_FOLDER)/%.net: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
@@ -378,7 +391,7 @@ $(DIST_FOLDER)/$(DIST_ZIP_FILE_NAME): $(BOM_FILE) $(DRILL_FILES) $(POS_FILES) $(
 	$(ZIP) $@ -r $(OUTPUT_FOLDER) $(ZIP_FLAGS)
 
 $(OUTPUT_FOLDER)/%.pdf: $(SCH_FOLDER)/$(PROJECT_NAME).pdf $(PCB_PDF_COPPER_FILES)
-	pdfunite $^ $@
+	pdfunite $^ $@ 2>/dev/null
 
 $(OUTPUT_FOLDER):
 	$(MKDIR) $@

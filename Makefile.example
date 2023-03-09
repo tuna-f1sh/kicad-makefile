@@ -8,7 +8,7 @@ PROJECT_ROOT = .
 # Define and set to 1 to limit info output
 # KICADMK_QUIET = 1
 # Define and set to 1 to append git describe tag and hash to export zips
-# KICADMK_APPEND_GIT = 1
+# KICADMK_APPEND_GIT ?= 1
 # Define and set to 0 to not generate log of variables to include in exports
 # KICADMK_INCLUDE_LOG = 1
 # Define and set to 1 to print the log content at start to shell
@@ -16,6 +16,8 @@ PROJECT_ROOT = .
 # Set to 1 to generate separated pdf and/or svg with pcb files
 # PCB_SEPARATE_PDF = 1
 # PCB_SEPARATE_SVG = 1
+# Define the PCB copper layers
+# PCB_COPPER_LAYERS = "F.Cu,B.Cu"
 
 # Define a command that generates a BoM - kibom installed with pip by default but could be path to Python script
 # ?= a good idea so that a CI and override this with a env
