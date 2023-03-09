@@ -34,7 +34,7 @@
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 0.6-aplha
+override KICADMK_VER = 0.7-aplha
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -297,6 +297,9 @@ clean-dist:
 
 clean-prod:
 	$(RM) $(PROD_FOLDER)
+
+clean-outputs:
+	$(RM) $(SUB_FOLDERS)
 
 $(BOM_FOLDER)/%.xml: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(BOM_FOLDER)
 	$(KICAD_CMD) sch export python-bom $(PYTHON_BOM_FLAGS) -o $@ $<
