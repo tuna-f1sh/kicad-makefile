@@ -321,7 +321,7 @@ $(PCB_FOLDER)/%.step: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
 	$(KICAD_CMD) pcb export step -o $@ $< 
 	
 $(PCB_FOLDER)/%.layer.pdf: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
-	$(KICAD_CMD) pcb export pdf $(PCB_PDF_FLAGS) --layers $(basename $(shell echo ‘$(@F)’ | $(GREP) -Eo "(\w+?_\w+?)\.\w+" | sed 's/_/./g')) -o $@ $<
+	$(KICAD_CMD) pcb export pdf $(PCB_PDF_FLAGS) --layers $(basename $(shell echo ‘$(@F)’ | $(GREP) -Eo "(\w+?_\w+?)\.\w+" | sed 's/_/./g')),Edge.Cuts -o $@ $<
 
 $(PCB_FOLDER)/%.pdf: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
 	$(KICAD_CMD) pcb export pdf $(PCB_PDF_FLAGS) --layers $(PCB_DRAWING_LAYERS) -o $@ $<
