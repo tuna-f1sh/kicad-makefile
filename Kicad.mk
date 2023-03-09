@@ -34,7 +34,7 @@
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 0.5-aplha
+override KICADMK_VER = 0.6-aplha
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -390,7 +390,7 @@ $(DIST_FOLDER)/$(REF_ZIP_FILE_NAME): $(REF_FILES) | $(DIST_FOLDER)
 $(DIST_FOLDER)/$(DIST_ZIP_FILE_NAME): $(BOM_FILE) $(DRILL_FILES) $(POS_FILES) $(GERBER_TARGET_FILES) $(PCB_FILES) $(SCH_FILES) $(PDF_FILE) | $(DIST_FOLDER)
 	$(ZIP) $@ -r $(OUTPUT_FOLDER) $(ZIP_FLAGS)
 
-$(OUTPUT_FOLDER)/%.pdf: $(SCH_FOLDER)/$(PROJECT_NAME).pdf $(PCB_PDF_COPPER_FILES)
+$(OUTPUT_FOLDER)/%.pdf: $(SCH_FOLDER)/$(PROJECT_NAME).pdf $(PCB_FOLDER)/$(PROJECT_NAME).pdf $(PCB_PDF_COPPER_FILES)
 	pdfunite $^ $@ 2>/dev/null
 
 $(OUTPUT_FOLDER):
