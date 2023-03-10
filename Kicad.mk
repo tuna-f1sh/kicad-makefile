@@ -34,7 +34,7 @@
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 0.7-aplha
+override KICADMK_VER = 0.8-aplha
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -215,7 +215,7 @@ ifeq ($(PCB_SEPARATE_SVG),1)
 endif
 PCB_ZIP_FILE_NAME = $(DIST_BASE_FILENAME)-pcb.zip
 
-REF_FILES = $(SCH_FILES) $(PCB_FILES)
+REF_FILES = $(SCH_FILES) $(PCB_FILES) $(PDF_FILE)
 REF_ZIP_FILE_NAME = $(DIST_BASE_FILENAME)-ref.zip
 
 LOG_HEADER = Files generated with KiCad Makefile $(KICADMK_VER) on $(shell date) for $(PROJECT_NAME)
@@ -265,12 +265,18 @@ endif
 
 all: prod dist
 
+# all output sub-folders
 dist: $(DIST_FOLDER)/$(DIST_ZIP_FILE_NAME)
+# mechanical files; step, dxf
 dist-mech: $(DIST_FOLDER)/$(MECH_ZIP_FILE_NAME)
+# sch renders: pdf, svg, net
 dist-sch: $(DIST_FOLDER)/$(SCH_ZIP_FILE_NAME)
+# pcb renders; pdf, svg, dxf, step
 dist-pcb: $(DIST_FOLDER)/$(PCB_ZIP_FILE_NAME)
+# pcb and sch renders
 dist-ref: $(DIST_FOLDER)/$(REF_ZIP_FILE_NAME)
 
+# production files in one zip; bom, pos, drill gerbers
 prod: $(PROD_FOLDER)/$(PRODUCTION_ALL_ZIP_FILE_NAME)
 prod-gerbers: $(PROD_FOLDER)/$(PRODUCTION_GERBER_ZIP_FILE_NAME)
 prod-pos: $(PROD_FOLDER)/$(PRODUCTION_POS_ZIP_FILE_NAME)
@@ -388,7 +394,7 @@ $(DIST_FOLDER)/$(PCB_ZIP_FILE_NAME): $(PCB_FILES) | $(DIST_FOLDER)
 	$(ZIP) $(ZIP_FLAGS) -j $@ $?
 
 $(DIST_FOLDER)/$(REF_ZIP_FILE_NAME): $(REF_FILES) | $(DIST_FOLDER)
-	$(ZIP) $(ZIP_FLAGS) -j $@ $?
+	$(ZIP) $@ $? $(ZIP_FLAGS) 
 
 $(DIST_FOLDER)/$(DIST_ZIP_FILE_NAME): $(BOM_FILE) $(DRILL_FILES) $(POS_FILES) $(GERBER_TARGET_FILES) $(PCB_FILES) $(SCH_FILES) $(PDF_FILE) | $(DIST_FOLDER)
 	$(ZIP) $@ -r $(OUTPUT_FOLDER) $(ZIP_FLAGS)
