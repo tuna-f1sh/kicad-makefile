@@ -18,7 +18,7 @@ The project is alpha status and also consider that the `kicad-cli` command is at
 
 ## Extra Setup
 
-* BoM: [KiBOM](https://github.com/SchrodingersGat/KiBoM) by default, requires install either with `pip` or path to repository - see Makefile.example and './bin/kibom'. Can be defined with `BOM_CMD` and `BOM_CMD_FLAGS`. Note that by default, the KiBOM script appends to target output so will be re-built whenever `BOM_FILE` is a prerequisite. One can fix this by supplying a 'bom.ini' with `output_file_name = %O`.
+* BoM: [KiBOM](https://github.com/SchrodingersGat/KiBoM) by default, requires install either with `pip` or path to repository - see [Makefile.example](https://github.com/tuna-f1sh/kicad-makefile/blob/main/Makefile.example) and './bin/kibom'. Can be defined with `BOM_CMD` and `BOM_CMD_FLAGS`. Note that by default, the KiBOM script appends to target output so will be re-built whenever `BOM_FILE` is a prerequisite. One can fix this by supplying a 'bom.ini' with `output_file_name = %O`.
 
 ## Container
 
@@ -36,7 +36,7 @@ See my [entree projec](https://github.com/tuna-f1sh/entree/actions) as an exampl
 
 ## Useful Variables
 
-Defaults shown, can be set in Makefile or environment. Refer to 'Makefile.example' for others.
+Defaults shown, can be set in Makefile or environment. Refer to [Makefile.example](https://github.com/tuna-f1sh/kicad-makefile/blob/main/Makefile.example) for others.
 
 ```
 # Main output folder for generated files
