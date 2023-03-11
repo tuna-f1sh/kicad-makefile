@@ -23,7 +23,10 @@ COPY . kicad-makefile/
 ENV KICADMK_DIR=/kicad-makefile
 
 # Add KiCad plugins used
-RUN pip install kibom && cp /kicad-makefile/bin/kibom /usr/bin
+RUN git clone https://github.com/SchrodingersGat/kibom && \
+      cd kibom && \
+      pip install . && \
+      cp /kicad-makefile/bin/kibom /usr/bin
 ENV BOM_CMD='python3 -m kibom'
 
 # Add pcbnew module to PYTHONPATH
