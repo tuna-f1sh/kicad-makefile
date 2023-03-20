@@ -261,7 +261,7 @@ ifeq ($(KICADMK_PRINT_LOG),1)
 	$(call shell_output,$(subst $(newline),\n\,$(LOG_CONTENT)))
 endif
 
-.PHONY: all clean clean-dist clean-prod prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech image pdf
+.PHONY: all clean clean-dist clean-prod clean-outputs prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech image pdf
 
 all: prod dist
 

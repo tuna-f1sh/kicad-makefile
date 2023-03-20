@@ -5,7 +5,7 @@ A Makefile for KiCad 7.0+. It leverages the new `kicad-cli` command included in 
 1. Clone this repository somewhere and define an environment variable `KICADMK_DIR` to the folder:
 `export KICADMK_DIR=/home/me/kicad-makefile`
 2. Copy the example Makefile 'Makefile.example' to the KiCad project to build:
-`cp Makefile.example /home/me/my_project`
+`cp Makefile.example /home/me/my_project/Makefile`
 3. Edit the example Makefile referring to comments as a guide.
 4. Run `make` to run default target that builds output, a merged sch and pcb .pdf and a distribution and production .zip:
 * ./output/my_project.pdf: merged pdf with sch pages and pcb copper layers.
