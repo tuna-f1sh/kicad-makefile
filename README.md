@@ -1,4 +1,4 @@
-A Makefile for KiCad 7.0+. It leverages the new `kicad-cli` command included in 7.0 to generate output data for distribution and production.
+A Makefile for KiCad 7.0+ projects. It leverages the new `kicad-cli` command included in 7.0 to generate output data for distribution and production.
 
 # Usage
 
@@ -32,7 +32,7 @@ The project also publish a [package](https://github.com/tuna-f1sh/kicad-makefile
 
 ## Integration with CI/CD
 
-See my [entree projec](https://github.com/tuna-f1sh/entree/actions) as an example of how to use this to build outputs for release etc.
+See my [entree project](https://github.com/tuna-f1sh/entree/actions) as an example of how to use this to build outputs for release etc.
 
 ## Useful Variables
 
