@@ -34,7 +34,7 @@
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 0.9-aplha
+override KICADMK_VER = 0.10-aplha
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -278,6 +278,7 @@ dist-ref: $(DIST_FOLDER)/$(REF_ZIP_FILE_NAME)
 
 # production files in one zip; bom, pos, drill gerbers
 prod: $(PROD_FOLDER)/$(PRODUCTION_ALL_ZIP_FILE_NAME)
+prod-all: prod prod-gerbers prod-pos prod-bom
 prod-gerbers: $(PROD_FOLDER)/$(PRODUCTION_GERBER_ZIP_FILE_NAME)
 prod-pos: $(PROD_FOLDER)/$(PRODUCTION_POS_ZIP_FILE_NAME)
 prod-bom: $(PROD_FOLDER)/$(PRODUCTION_BOM_ZIP_FILE_NAME)
@@ -358,7 +359,7 @@ $(GERBER_FOLDER)/%-job.gbrjob: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(GER
 	$(KICAD_CMD) pcb export gerber $(GERBER_FLAGS) --layers $(basename $(shell echo ‘$(@F)’ | $(GREP) -Eo "(\w+?_\w+?)\.\w+" | sed 's/_/./g')) -o $@ $< 
 
 $(DRILL_FOLDER)/%-PTH.drl $(DRILL_FOLDER)/%-NPTH.drl: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(DRILL_FOLDER)
-	$(KICAD_CMD) pcb export drill $(DRILL_FLAGS) --separate-files --excellon-separate-th -o '$(@D)'/ $< 
+	$(KICAD_CMD) pcb export drill $(DRILL_FLAGS) --excellon-separate-th -o '$(@D)'/ $< 
 
 $(DRILL_FOLDER)/%.drl: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(DRILL_FOLDER)
 	$(KICAD_CMD) pcb export drill $(DRILL_FLAGS) -o  '$(@D)'/ $< 
