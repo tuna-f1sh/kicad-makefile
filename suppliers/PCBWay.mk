@@ -10,4 +10,5 @@ POS_FILENAMES = $(PROJECT_NAME)-both.pos
 PROD_FOLDER ?= $(OUTPUT_FOLDER)/prod-pcbway
 
 # PCB takes separate zips
-prod: $(MAKE) prod-all
+prod: 
+	$(MAKE) prod-all
