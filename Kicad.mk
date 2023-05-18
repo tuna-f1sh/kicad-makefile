@@ -278,7 +278,7 @@ dist-ref: $(DIST_FOLDER)/$(REF_ZIP_FILE_NAME)
 
 # production files in one zip; bom, pos, drill gerbers
 prod: $(PROD_FOLDER)/$(PRODUCTION_ALL_ZIP_FILE_NAME)
-prod-all: prod prod-gerbers prod-pos prod-bom
+prod-all: prod-gerbers prod-pos prod-bom
 prod-gerbers: $(PROD_FOLDER)/$(PRODUCTION_GERBER_ZIP_FILE_NAME)
 prod-pos: $(PROD_FOLDER)/$(PRODUCTION_POS_ZIP_FILE_NAME)
 prod-bom: $(PROD_FOLDER)/$(PRODUCTION_BOM_ZIP_FILE_NAME)
