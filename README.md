@@ -14,7 +14,7 @@ A Makefile for KiCad 7.0+ projects. It leverages the new `kicad-cli` command inc
 
 Refer to 'Kicad.mk' for other targets.
 
-The project is alpha status and also consider that the `kicad-cli` command is at an early stage; things might change!
+The project is fairly stable at this point consider that the `kicad-cli` command is at an early stage; things might change!
 
 ## Extra Setup
 
