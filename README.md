@@ -1,4 +1,4 @@
-A Makefile for KiCad 7.0+ projects. It leverages the new `kicad-cli` command included in 7.0 to generate output data for distribution and production.
+A Makefile for KiCad 7.0+ projects. It leverages the new `kicad-cli` command included in 7.0-> to generate output data for distribution and production. Designed to be used locally and in CI/CD pipelines. With the addition of ERC/DRC checks in KiCad 8.0, it can be used to pass/fail builds based on these checks.
 
 # Usage
 

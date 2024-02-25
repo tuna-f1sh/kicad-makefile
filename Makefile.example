@@ -1,5 +1,5 @@
 # Must be name of the .kicad_pro, .kicad_pcb and root .kicad_sch
-PROJECT_NAME = my_project
+PROJECT_NAME ?= $(basename $(wildcard *.kicad_pro))
 # Directory containing PROJECT_NAME.kicad_* files
 PROJECT_ROOT = .
 

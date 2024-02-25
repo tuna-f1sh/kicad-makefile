@@ -1,4 +1,4 @@
-# KiCad Makefile - J.Whittington 2023
+# KiCad Makefile - J.Whittington 2024
 # -----------------------------------
 # Designed to be included by a Makefile within a KiCad project. 
 #
@@ -26,7 +26,7 @@
 # PCB_COPPER_LAYERS = "F.Cu,B.Cu"
 #
 # Define a command that generates a BoM - kibom installed with pip by default but could be path to Python script
-# ?= a good idea so that a CI and override this with a env
+# ?= a good idea so that a CI can override this with a env
 # BOM_CMD ?= python3 -m kibom
 # BOM_CMD ?= python3 ~/KiBoM/KiBOM_CLI.py
 # KiBoM by default creates output with _bom_REV.csv appended, pass a config file to it to match target BoM name
@@ -34,7 +34,7 @@
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 1.0
+override KICADMK_VER = 1.1
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -124,8 +124,16 @@ DXF_LAYERS ?= "Edge.Cuts,Dwgs.User,Cmts.User,Eco1.User,Eco2.User,F.Fab,B.Fab"
 DXF_FLAGS += --layers $(DXF_LAYERS)
 # PCB_PDF_FLAGS +=
 # PCB_SVG_FLAGS +=
+# PCB_DRC_FLAGS +=
+# SCH_ERC_FLAGS +=
 # flags for zip archives
 ZIP_FLAGS += -x \*.zip \*.ini \*.xml $(DIST_FOLDER)\* $(PROD_FOLDER)\*
+
+# if set to 1, will add --exit-code-violations to SCH_ERC_FLAGS and PCB_DRC_FLAGS so CI will fail if there are any
+ifeq ($(EXIT_CODE_VIOLATIONS),1)
+	SCH_ERC_FLAGS += --exit-code-violations
+	PCB_DRC_FLAGS += --exit-code-violations
+endif
 
 ifneq ($(call dir_if_exists,$(PROJECT_ROOT)/.git),)
 		GIT_DESCRIBE := $(call git_tag_ver)
@@ -135,6 +143,8 @@ endif
 BOM_FILENAME ?= $(PROJECT_NAME).csv # if using KiBOM this should be configured in the bom.ini to match to avoid re-build
 DRILL_FILENAMES ?= $(PROJECT_NAME).drl
 POS_FILENAMES ?= $(PROJECT_NAME)-both.pos $(PROJECT_NAME)-top.pos $(PROJECT_NAME)-bottom.pos
+ERC_FILENAME ?= $(SCH_FOLDER)/$(PROJECT_NAME).rpt
+DRC_FILENAME ?= $(PCB_FOLDER)/$(PROJECT_NAME).rpt
 
 DIST_BASE_FILENAME ?= $(PROJECT_NAME)
 PROD_BASE_FILENAME ?= $(PROJECT_NAME)
@@ -197,16 +207,16 @@ PRODUCTION_GERBER_ZIP_FILES = $(GERBER_FILES) $(wildcard $(DRILL_FOLDER)/*.drl $
 PRODUCTION_GERBER_ZIP_FILE_NAME = $(PROD_BASE_FILENAME)-gerber.zip
 
 PRODUCTION_POS_ZIP_FILE_NAME = $(PROD_BASE_FILENAME)-pos.zip
-
 PRODUCTION_BOM_ZIP_FILE_NAME = $(PROD_BASE_FILENAME)-bom.zip
 
 MECH_FILES = $(PCB_FOLDER)/$(PROJECT_NAME).step $(PCB_FOLDER)/$(PROJECT_NAME).dxf $(LOG_FILE)
 MECH_ZIP_FILE_NAME = $(DIST_BASE_FILENAME)-mech.zip
 
-SCH_FILES = $(SCH_FOLDER)/$(PROJECT_NAME).pdf $(SCH_FOLDER)/$(PROJECT_NAME).svg $(SCH_FOLDER)/$(PROJECT_NAME).net $(LOG_FILE)
+SCH_FILES = $(SCH_FOLDER)/$(PROJECT_NAME).pdf $(SCH_FOLDER)/$(PROJECT_NAME).svg $(SCH_FOLDER)/$(PROJECT_NAME).net $(ERC_FILENAME) $(LOG_FILE)
 SCH_ZIP_FILE_NAME = $(DIST_BASE_FILENAME)-sch.zip
 
-PCB_FILES = $(MECH_FILES) $(PCB_FOLDER)/$(PROJECT_NAME).pdf $(PCB_FOLDER)/$(PROJECT_NAME).svg $(LOG_FILE)
+PCB_FILES = $(MECH_FILES) $(PCB_FOLDER)/$(PROJECT_NAME).pdf $(PCB_FOLDER)/$(PROJECT_NAME).svg $(DRC_FILENAME) $(LOG_FILE)
+
 ifeq ($(PCB_SEPARATE_PDF),1)
 	PCB_FILES += $(PCB_PDF_COPPER_FILES)
 endif
@@ -234,6 +244,7 @@ $(call config_variable,PYTHON_BOM_FLAGS,-,1)
 ## SCH
 $(call config_variable,PDF_FLAGS,-,1)
 $(call config_variable,SVG_FLAGS,-,1)
+$(call config_variable,SCH_ERC_FLAGS,-,1)
 ## PCB
 $(call config_variable,PCB_COPPER_LAYERS,-,1)
 $(call config_variable,PCB_DRAWING_LAYERS,-,1)
@@ -243,6 +254,7 @@ $(call config_variable,PDF_LAYERS,-,1)
 $(call config_variable,PCB_PDF_FLAGS,-,1)
 $(call config_variable,SVG_LAYERS,-,1)
 $(call config_variable,PCB_SVG_FLAGS,-,1)
+$(call config_variable,PCB_DRC_FLAGS,-,1)
 ## Production
 $(call config_variable,STEP_FLAGS,-,1)
 $(call config_variable,GERBER_TARGET_FILES,-,1)
@@ -292,6 +304,9 @@ mech: $(MECH_FILES)
 net: $(SCH_FOLDER)/$(PROJECT_NAME).net
 gerbers: $(GERBER_TARGET_FILES) | $(GERBER_FOLDER)
 pdf: $(PDF_FILE)
+rules: erc drc
+erc: $(ERC_FILENAME)
+drc: $(DRC_FILENAME)
 
 image: $(KICADMK_DIR)/Dockerfile
 	docker build --tag kicad-makefile:latest --label kicad-makefile $(KICADMK_DIR)/.
@@ -312,9 +327,8 @@ $(BOM_FOLDER)/%.xml: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(BOM_FOLDER)
 	$(KICAD_CMD) sch export python-bom $(PYTHON_BOM_FLAGS) -o $@ $<
 
 $(BOM_FOLDER)/%.csv: $(BOM_FOLDER)/%.xml | $(BOM_FOLDER)
-	# remove any existing since target might not match
 ifneq ($(wildcard $(BOM_FOLDER)/*.csv),)
-	rm $(BOM_FOLDER)/*.csv
+	rm -v $(BOM_FOLDER)/*.csv
 endif
 	$(BOM_CMD) $(BOM_CMD_FLAGS) $< $@ 
 
@@ -326,6 +340,12 @@ $(SCH_FOLDER)/%.pdf: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
 
 $(SCH_FOLDER)/%.svg: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
 	$(KICAD_CMD) sch export svg $(STEP_FLAGS) -o '$(@D)' $<
+
+$(SCH_FOLDER)/%.rpt: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
+	$(KICAD_CMD) sch erc $(SCH_ERC_FLAGS) -o $@ $<
+
+$(SCH_FOLDER)/%.json: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
+	$(KICAD_CMD) sch erc --format=json $(SCH_ERC_FLAGS) -o $@ $<
 
 $(PCB_FOLDER)/%.step: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
 	$(KICAD_CMD) pcb export step -o $@ $< 
@@ -344,6 +364,12 @@ $(PCB_FOLDER)/%.svg: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
 
 $(PCB_FOLDER)/%.dxf: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
 	$(KICAD_CMD) pcb export dxf $(DXF_FLAGS) -o $@ $<
+
+$(PCB_FOLDER)/%.rpt: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
+	$(KICAD_CMD) pcb drc $(PCB_DRC_FLAGS) -o $@ $<
+
+$(PCB_FOLDER)/%.json: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
+	$(KICAD_CMD) pcb drc --format=json $(PCB_DRC_FLAGS) -o $@ $<
 
 # non-specific target to use layers
 # $(GERBER_FOLDER)/.gerbers: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(GERBER_FOLDER)
