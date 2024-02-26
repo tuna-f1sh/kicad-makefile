@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 MAINTAINER John Whittington <git@jbrengineering.co.uk>
-LABEL Description="KiCad 7.0 with KiCad Makefile and plugins used"
+LABEL Description="KiCad 8.0 with KiCad Makefile and plugins used"
 
 RUN apt update && \
       apt upgrade -y && \
@@ -11,11 +11,11 @@ RUN apt update && \
 
 RUN DEBIAN_FRONTEND=noninteractive apt install software-properties-common -y
 
-# Adding the repository for KiCad 7.0 stable release
-RUN add-apt-repository --yes ppa:kicad/kicad-7.0-releases && \
+# Adding the repository for KiCad 8.0 stable release
+RUN add-apt-repository --yes ppa:kicad/kicad-8.0-releases && \
       apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 245D5502FAD7A805
 
-# Install KiCad 7.0
+# Install KiCad 8.0
 RUN apt update && apt install kicad -y
 
 # Copy kicad-makefile and export environment location
