@@ -18,7 +18,12 @@ The project is fairly stable at this point consider that the `kicad-cli` command
 
 ## Extra Setup
 
-* BoM: [KiBOM](https://github.com/SchrodingersGat/KiBoM) by default, requires install either with `pip` or path to repository - see [Makefile.example](https://github.com/tuna-f1sh/kicad-makefile/blob/main/Makefile.example) and './bin/kibom'. Can be defined with `BOM_CMD` and `BOM_CMD_FLAGS`. Note that by default, the KiBOM script appends to target output so will be re-built whenever `BOM_FILE` is a prerequisite. One can fix this by supplying a 'bom.ini' with `output_file_name = %O`.
+These steps are optional and can be skipped if the defaults are acceptable.
+
+> [!NOTE]
+> `BOM_CMD` is required for KiCad < 8.0 as it does not include a BOM generation tool. KiCad 8.0+ includes a BOM generation tool, but it is not as feature rich as KiBOM. If you want to use KiBOM with KiCad 8.0+, you will need to install it and set `BOM_CMD` to the path to the KiBOM executable.
+
+* `BOM_CMD`: [KiBOM](https://github.com/SchrodingersGat/KiBoM): requires install either with `pip` or path to repository - see [Makefile.example](https://github.com/tuna-f1sh/kicad-makefile/blob/main/Makefile.example) and './bin/kibom'. Can be defined with `BOM_CMD` and `BOM_CMD_FLAGS`. Note that by default, the KiBOM script appends to target output so will be re-built whenever `BOM_FILE` is a prerequisite. One can fix this by supplying a 'bom.ini' with `output_file_name = %O`.
 
 ## Container
 
@@ -33,6 +38,8 @@ The project also publish a [package](https://github.com/tuna-f1sh/kicad-makefile
 ## Integration with CI/CD
 
 See my [entree project](https://github.com/tuna-f1sh/entree/actions) as an example of how to use this to build outputs for release etc.
+
+Use the environment variable `EXIT_CODE_VIOLATIONS=1` to fail the build on ERC/DRC violations. The rules are checked as part of the `sch` and `pcb` targets. To just check rules with exit code, use `EXIT_CODE_VIOLATIONS=1 make rules` Alternatively, the to the `SCH_ERC_FLAGS` and `PCB_DRC_FLAGS` `--exit-code-violations`
 
 ## Useful Variables
 

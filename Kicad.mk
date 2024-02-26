@@ -89,8 +89,7 @@ ifndef KICAD_CMD
 	endif
 endif
 KICAD_VERSION := $(shell $(KICAD_CMD) version)
-BOM_CMD ?= python3 -m kibom
-BOM_CMD_FLAGS +=
+BOM_CMD ?= $(KICAD_CMD) sch export bom
 
 GREP ?= grep
 RM = rm -rf
@@ -113,6 +112,7 @@ DXF_LAYERS ?= "Edge.Cuts,Dwgs.User,Cmts.User,Eco1.User,Eco2.User,F.Fab,B.Fab"
 # GERBER_LAYERS = "F.Cu,B.Cu" # can be defined
 
 ## FLAGS
+# BOM_CMD_FLAGS +=
 # kicad-cli command flags
 # PDF_FLAGS +=
 # SVG_FLAGS +=
@@ -141,6 +141,12 @@ endif
 
 ## FILES
 BOM_FILENAME ?= $(PROJECT_NAME).csv # if using KiBOM this should be configured in the bom.ini to match to avoid re-build
+# if BOM_CMD contains kibom change the BOM_FILENAME so uses phony kibom target as has different dependencies and args
+# maybe a nicer way to do this...
+ifneq (,$(findstring kibom,$(BOM_CMD)))
+	BOM_FILENAME := $(basename $(BOM_FILENAME)).kibom
+endif
+
 DRILL_FILENAMES ?= $(PROJECT_NAME).drl
 POS_FILENAMES ?= $(PROJECT_NAME)-both.pos $(PROJECT_NAME)-top.pos $(PROJECT_NAME)-bottom.pos
 ERC_FILENAME ?= $(SCH_FOLDER)/$(PROJECT_NAME).rpt
@@ -273,7 +279,7 @@ ifeq ($(KICADMK_PRINT_LOG),1)
 	$(call shell_output,$(subst $(newline),\n\,$(LOG_CONTENT)))
 endif
 
-.PHONY: all clean clean-dist clean-prod clean-outputs prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech image pdf
+.PHONY: all clean clean-dist clean-prod clean-outputs prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech image pdf $(BOM_FOLDER)/%.kibom
 
 all: prod dist
 
@@ -326,11 +332,11 @@ clean-outputs:
 $(BOM_FOLDER)/%.xml: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(BOM_FOLDER)
 	$(KICAD_CMD) sch export python-bom $(PYTHON_BOM_FLAGS) -o $@ $<
 
-$(BOM_FOLDER)/%.csv: $(BOM_FOLDER)/%.xml | $(BOM_FOLDER)
-ifneq ($(wildcard $(BOM_FOLDER)/*.csv),)
-	rm -v $(BOM_FOLDER)/*.csv
-endif
+$(BOM_FOLDER)/%.kibom: $(BOM_FOLDER)/$(PROJECT_NAME).xml | $(BOM_FOLDER)
 	$(BOM_CMD) $(BOM_CMD_FLAGS) $< $@ 
+
+$(BOM_FOLDER)/%.csv: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(BOM_FOLDER)
+	$(BOM_CMD) $(BOM_CMD_FLAGS) -o $@ $<
 
 $(SCH_FOLDER)/%.net: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
 	$(KICAD_CMD) sch export netlist -o $@ $<
