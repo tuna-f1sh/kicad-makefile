@@ -18,7 +18,7 @@ RUN add-apt-repository --yes ppa:kicad/kicad-8.0-releases && \
       apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 245D5502FAD7A805
 
 # Install KiCad 8.0
-RUN apt update && apt install kicad -y
+RUN apt update && apt install --install-recommends kicad -y
 
 # Copy kicad-makefile and export environment location
 COPY . kicad-makefile/
@@ -33,6 +33,11 @@ ENV BOM_CMD='python3 -m kibom'
 
 # Add pcbnew module to PYTHONPATH
 ENV PYTHONPATH=${PYTHONPATH}:/.kicad/scripting/plugins:/usr/share/kicad/scripting/plugins
+
+# Copy default fp-lib-table to user home kicad config
+RUN mkdir -p ~/.config/kicad/8.0 && \
+      cp /usr/share/kicad/template/fp-lib-table ~/.config/kicad/8.0/fp-lib-table && \
+      cp /usr/share/kicad/template/sym-lib-table ~/.config/kicad/8.0/sym-lib-table
 
 # Set env to show running in container
 ENV KICADMK_DOCKER=1
