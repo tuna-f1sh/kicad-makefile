@@ -2,6 +2,8 @@ FROM ubuntu:latest
 MAINTAINER John Whittington <git@jbrengineering.co.uk>
 LABEL Description="KiCad 8.0 with KiCad Makefile and plugins used"
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN apt update && \
       apt upgrade -y && \
       apt install -y wget make zip git python3 python3-pip poppler-utils && \
@@ -9,14 +11,14 @@ RUN apt update && \
       apt autoremove -y && \
       apt clean
 
-RUN DEBIAN_FRONTEND=noninteractive apt install software-properties-common -y
+RUN apt install software-properties-common -y
 
 # Adding the repository for KiCad 8.0 stable release
 RUN add-apt-repository --yes ppa:kicad/kicad-8.0-releases && \
       apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 245D5502FAD7A805
 
 # Install KiCad 8.0
-RUN apt update && apt install kicad -y
+RUN apt update && apt install kicad -y --assume-yes
 
 # Copy kicad-makefile and export environment location
 COPY . kicad-makefile/
