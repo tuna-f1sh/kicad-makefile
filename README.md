@@ -1,4 +1,4 @@
-A Makefile for KiCad 7.0+ projects. It leverages the new `kicad-cli` command included in 7.0-> to generate output data for distribution and production. Designed to be used locally and in CI/CD pipelines. With the addition of ERC/DRC checks in KiCad 8.0, it can be used to pass/fail builds based on these checks.
+A Makefile for KiCad 7.0 -> projects. It leverages the new `kicad-cli` command included in 7.0 -> to generate output data for distribution and production. Designed to be used locally and in CI/CD pipelines. With the addition of ERC/DRC checks in KiCad 8.0, it can be used to pass/fail builds based on these checks.
 
 # Usage
 
@@ -16,15 +16,6 @@ Refer to 'Kicad.mk' for other targets.
 
 The project is fairly stable at this point consider that the `kicad-cli` command is at an early stage; things might change!
 
-## Extra Setup
-
-These steps are optional and can be skipped if the defaults are acceptable.
-
-> [!NOTE]
-> `BOM_CMD` is required for KiCad < 8.0 as it does not include a BOM generation tool. KiCad 8.0+ includes a BOM generation tool, but it is not as feature rich as KiBOM. If you want to use KiBOM with KiCad 8.0+, you will need to install it and set `BOM_CMD` to the path to the KiBOM executable.
-
-* `BOM_CMD`: [KiBOM](https://github.com/SchrodingersGat/KiBoM): requires install either with `pip` or path to repository - see [Makefile.example](https://github.com/tuna-f1sh/kicad-makefile/blob/main/Makefile.example) and './bin/kibom'. Can be defined with `BOM_CMD` and `BOM_CMD_FLAGS`. Note that by default, the KiBOM script appends to target output so will be re-built whenever `BOM_FILE` is a prerequisite. One can fix this by supplying a 'bom.ini' with `output_file_name = %O`.
-
 ## Container
 
 A target to build a docker container is available `make image`. One can then run make within the KiCad project folder with:
@@ -40,6 +31,15 @@ The project also publish a [package](https://github.com/tuna-f1sh/kicad-makefile
 See my [entree project](https://github.com/tuna-f1sh/entree/actions) as an example of how to use this to build outputs for release etc.
 
 Use the environment variable `EXIT_CODE_VIOLATIONS=1` to fail the build on ERC/DRC violations. The rules are checked as part of the `sch` and `pcb` targets. To just check rules with exit code, use `EXIT_CODE_VIOLATIONS=1 make rules` Alternatively, the to the `SCH_ERC_FLAGS` and `PCB_DRC_FLAGS` `--exit-code-violations`
+
+## Extra Setup
+
+These steps are optional and can be skipped if the defaults are acceptable.
+
+> [!NOTE]
+> `BOM_CMD` is required for KiCad < 8.0 as it does not include a BOM generation tool. KiCad 8.0+ includes a BOM generation tool, but it is not as feature rich as KiBOM.
+
+* `BOM_CMD`: [KiBOM](https://github.com/SchrodingersGat/KiBoM): requires install either with `pip` or path to repository - see [Makefile.example](https://github.com/tuna-f1sh/kicad-makefile/blob/main/Makefile.example) and './bin/kibom'. Can be defined with `BOM_CMD` and `BOM_CMD_FLAGS`. Note that by default, the KiBOM script appends to target output so will be re-built whenever `BOM_FILE` is a prerequisite. One can fix this by supplying a 'bom.ini' with `output_file_name = %O`.
 
 ## Useful Variables
 
