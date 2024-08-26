@@ -34,7 +34,7 @@
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 1.2
+override KICADMK_VER = 1.3
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -345,7 +345,7 @@ $(SCH_FOLDER)/%.pdf: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
 	$(KICAD_CMD) sch export pdf $(PDF_FLAGS) -o $@ $<
 
 $(SCH_FOLDER)/%.svg: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
-	$(KICAD_CMD) sch export svg $(STEP_FLAGS) -o '$(@D)' $<
+	$(KICAD_CMD) sch export svg $(SVG_FLAGS) -o '$(@D)' $<
 
 $(SCH_FOLDER)/%.rpt: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
 	$(KICAD_CMD) sch erc $(SCH_ERC_FLAGS) -o $@ $<
@@ -354,7 +354,7 @@ $(SCH_FOLDER)/%.json: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_sch | $(SCH_FOLDER)
 	$(KICAD_CMD) sch erc --format=json $(SCH_ERC_FLAGS) -o $@ $<
 
 $(PCB_FOLDER)/%.step: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
-	$(KICAD_CMD) pcb export step -o $@ $< 
+	$(KICAD_CMD) pcb export step $(STEP_FLAGS) -o $@ $< 
 	
 $(PCB_FOLDER)/%.layer.pdf: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(PCB_FOLDER)
 	$(KICAD_CMD) pcb export pdf $(PCB_PDF_FLAGS) --layers $(basename $(shell echo ‘$(@F)’ | $(GREP) -Eo "(\w+?_\w+?)\.\w+" | sed 's/_/./g')),Edge.Cuts -o $@ $<
