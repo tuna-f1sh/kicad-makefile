@@ -27,7 +27,7 @@ ENV KICADMK_DIR=/kicad-makefile
 # Add KiCad plugins used
 RUN git clone https://github.com/SchrodingersGat/kibom && \
       cd kibom && \
-      pip install . && \
+      pip install --break-system-packages . && \
       cp /kicad-makefile/bin/kibom /usr/bin
 ENV BOM_CMD='python3 -m kibom'
 
