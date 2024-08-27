@@ -18,6 +18,8 @@ PROJECT_ROOT = .
 # PCB_SEPARATE_SVG = 1
 # Define the PCB copper layers
 # PCB_COPPER_LAYERS = "F.Cu,B.Cu"
+# Substitutes VRML models with STEP/IGS models, which are more widely supported
+STEP_FLAGS = --subst-models
 
 # Define a command that generates a BoM - kibom installed with pip by default but could be path to Python script
 # ?= a good idea so that a CI and override this with a env
