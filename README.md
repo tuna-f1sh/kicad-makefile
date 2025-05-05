@@ -1,4 +1,4 @@
-A Makefile for KiCad 7.0 -> projects. It leverages the new `kicad-cli` command included in 7.0 -> to generate output data for distribution and production. Designed to be used locally and in CI/CD pipelines. With the addition of ERC/DRC checks in KiCad 8.0, it can be used to pass/fail builds based on these checks.
+A Makefile for KiCad 7.0 -> projects. It leverages the new `kicad-cli` command included in 7.0 -> to generate output data for distribution and production. Designed to be used locally and in CI/CD pipelines. With the addition of ERC/DRC checks in KiCad 8.0+, it can be used to pass/fail builds based on these checks.
 
 # Usage
 
@@ -26,8 +26,9 @@ The project also publish a [package](https://github.com/tuna-f1sh/kicad-makefile
 
 `docker pull ghcr.io/tuna-f1sh/kicad-makefile:latest`
 
-The image uses the latest major KiCad release. For previous releases:
+The image uses the latest major KiCad release (9.0). For previous releases:
 
+* 8.0 [tag `v1.2`]: `ghcr.io/tuna-f1sh/kicad-makefile:v1.2`
 * 7.0 [tag `v1.0`]: `ghcr.io/tuna-f1sh/kicad-makefile:v1.0`
 
 ## Integration with CI/CD

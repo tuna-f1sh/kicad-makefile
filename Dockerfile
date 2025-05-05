@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 MAINTAINER John Whittington <git@jbrengineering.co.uk>
-LABEL Description="KiCad 8.0 with KiCad Makefile and plugins used"
+LABEL Description="KiCad 9.0 with KiCad Makefile and plugins used"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -13,11 +13,11 @@ RUN apt update && \
 
 RUN apt install software-properties-common -y
 
-# Adding the repository for KiCad 8.0 stable release
-RUN add-apt-repository --yes ppa:kicad/kicad-8.0-releases && \
+# Adding the repository for KiCad 9.0 stable release
+RUN add-apt-repository --yes ppa:kicad/kicad-9.0-releases && \
       apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 245D5502FAD7A805
 
-# Install KiCad 8.0
+# Install KiCad 9.0
 RUN apt update && apt install --install-recommends kicad -y
 
 # Copy kicad-makefile and export environment location
@@ -35,9 +35,9 @@ ENV BOM_CMD='python3 -m kibom'
 ENV PYTHONPATH=${PYTHONPATH}:/.kicad/scripting/plugins:/usr/share/kicad/scripting/plugins
 
 # Copy default fp-lib-table to user home kicad config
-RUN mkdir -p ~/.config/kicad/8.0 && \
-      cp /usr/share/kicad/template/fp-lib-table ~/.config/kicad/8.0/fp-lib-table && \
-      cp /usr/share/kicad/template/sym-lib-table ~/.config/kicad/8.0/sym-lib-table
+RUN mkdir -p ~/.config/kicad/9.0 && \
+      cp /usr/share/kicad/template/fp-lib-table ~/.config/kicad/9.0/fp-lib-table && \
+      cp /usr/share/kicad/template/sym-lib-table ~/.config/kicad/9.0/sym-lib-table
 
 # Set env to show running in container
 ENV KICADMK_DOCKER=1
