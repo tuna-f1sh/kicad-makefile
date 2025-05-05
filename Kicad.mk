@@ -34,7 +34,7 @@
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 1.3
+override KICADMK_VER = 1.4
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -295,8 +295,8 @@ dist-pcb: $(DIST_FOLDER)/$(PCB_ZIP_FILE_NAME)
 dist-ref: $(DIST_FOLDER)/$(REF_ZIP_FILE_NAME)
 
 # production files in one zip; bom, pos, drill gerbers
-prod: $(PROD_FOLDER)/$(PRODUCTION_ALL_ZIP_FILE_NAME)
-prod-all: prod-gerbers prod-pos prod-bom
+prod: clean-outputs $(PROD_FOLDER)/$(PRODUCTION_ALL_ZIP_FILE_NAME)
+prod-all: clean-outputs prod-gerbers prod-pos prod-bom
 prod-gerbers: $(PROD_FOLDER)/$(PRODUCTION_GERBER_ZIP_FILE_NAME)
 prod-pos: $(PROD_FOLDER)/$(PRODUCTION_POS_ZIP_FILE_NAME)
 prod-bom: $(PROD_FOLDER)/$(PRODUCTION_BOM_ZIP_FILE_NAME)
@@ -320,10 +320,10 @@ image: $(KICADMK_DIR)/Dockerfile
 clean:
 	$(RM) $(OUTPUT_FOLDER)
 
-clean-dist:
+clean-dist: clean-outputs
 	$(RM) $(DIST_FOLDER)
 
-clean-prod:
+clean-prod: clean-outputs
 	$(RM) $(PROD_FOLDER)
 
 clean-outputs:
