@@ -34,7 +34,7 @@
 #
 # * Project generated data will be output to '$(PROJECT_ROOT)/output/X' by default
 # * Project distributables and production .zip datapacks will be output to '$(PROJECT_ROOT)/output/dist' and '$(PROJECT_ROOT)/output/prod' by default
-override KICADMK_VER = 1.4
+override KICADMK_VER = 1.5
 
 shell_output =
 KICADMK_QUIET ?= 0
@@ -148,7 +148,7 @@ ifneq (,$(findstring kibom,$(BOM_CMD)))
 endif
 
 DRILL_FILENAMES ?= $(PROJECT_NAME).drl
-POS_FILENAMES ?= $(PROJECT_NAME)-both.pos $(PROJECT_NAME)-top.pos $(PROJECT_NAME)-bottom.pos
+POS_FILENAMES ?= $(PROJECT_NAME)-both.pos $(PROJECT_NAME)-top.pos $(PROJECT_NAME)-bottom.pos $(PROJECT_NAME)-both-pos.csv
 ERC_FILENAME ?= $(SCH_FOLDER)/$(PROJECT_NAME).rpt
 DRC_FILENAME ?= $(PCB_FOLDER)/$(PROJECT_NAME).rpt
 
@@ -404,6 +404,18 @@ $(POS_FOLDER)/%-bottom.pos: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(POS_FO
 
 $(POS_FOLDER)/%.pos: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(POS_FOLDER)
 	$(KICAD_CMD) pcb export pos $(POS_FLAGS) -o $@ $< 
+
+$(POS_FOLDER)/%-jlcpcb.csv: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(POS_FOLDER)
+	$(KICAD_CMD) pcb export pos $(POS_FLAGS) --format csv -o $@ $<
+	# Rename columns to match JLCPCB requirements Ref->Designator, PosX->Mid X, PosY->Mid Y, Rot->Rotation Side->Layer
+	sed -i '1s/Ref/Designator/' $@
+	sed -i '1s/PosX/Mid X/' $@
+	sed -i '1s/PosY/Mid Y/' $@
+	sed -i '1s/Rot/Rotation/' $@
+	sed -i '1s/Side/Layer/' $@
+
+$(POS_FOLDER)/%.csv: $(PROJECT_ROOT)/$(PROJECT_NAME).kicad_pcb | $(POS_FOLDER)
+	$(KICAD_CMD) pcb export pos $(POS_FLAGS) --format csv -o $@ $<
 
 $(PROD_FOLDER)/$(PRODUCTION_BOM_ZIP_FILE_NAME): $(BOM_FILE) | $(PROD_FOLDER)
 	$(ZIP) $(ZIP_FLAGS) -j $@ $(BOM_FOLDER)/*.csv 
