@@ -26,8 +26,9 @@ The project also publish a [package](https://github.com/tuna-f1sh/kicad-makefile
 
 `docker pull ghcr.io/tuna-f1sh/kicad-makefile:latest`
 
-The image uses the latest major KiCad release (9.0). For previous releases:
+The image uses the latest major KiCad release (10.0). For previous releases:
 
+* 9.0 [tag `v1.5`]: `ghcr.io/tuna-f1sh/kicad-makefile:v1.5`
 * 8.0 [tag `v1.2`]: `ghcr.io/tuna-f1sh/kicad-makefile:v1.2`
 * 7.0 [tag `v1.0`]: `ghcr.io/tuna-f1sh/kicad-makefile:v1.0`
 
