@@ -32,6 +32,28 @@ The image uses the latest major KiCad release (10.0). For previous releases:
 * 8.0 [tag `v1.2`]: `ghcr.io/tuna-f1sh/kicad-makefile:v1.2`
 * 7.0 [tag `v1.0`]: `ghcr.io/tuna-f1sh/kicad-makefile:v1.0`
 
+### User fp-lib-table / sym-lib-table and libraries
+
+ERC/DRC checks compare symbols/footprints used in the project against those available to KiCad. Without a project's own symbols/footprints/tables available in the container, a warning is produced. Mount a directory containing your own `fp-lib-table`, `sym-lib-table` and/or library folders to `/config` and the entrypoint will copy them over the image defaults (`~/.config/kicad/10.0`) before running:
+
+```
+docker run --rm -v "$(pwd)":/project -v "$(pwd)/kicad-config":/config kicad-makefile:latest make
+```
+
+Only files present in the mounted folder are overridden, so partial overrides (eg just `fp-lib-table`) are supported. This also works with the published package image.
+
+### Lite image
+
+The default image includes KiCad's bundled footprints, symbols, templates and 3D models, making it > 7 GB. A 'lite' image without these can be built with:
+
+`make image-lite`
+
+This uses `docker build --build-arg KICAD_INSTALL_FLAGS=--no-install-recommends`. Use the `/config` mount above to supply your own libraries/tables (or clone them during CI) for use with the lite image.
+
+A `-lite` suffixed tag of the published package is also available, eg:
+
+`docker pull ghcr.io/tuna-f1sh/kicad-makefile:latest-lite`
+
 ## Integration with CI/CD
 
 See my [entree project](https://github.com/tuna-f1sh/entree/actions) as an example of how to use this to build outputs for release etc.

@@ -279,7 +279,7 @@ ifeq ($(KICADMK_PRINT_LOG),1)
 	$(call shell_output,$(subst $(newline),\n\,$(LOG_CONTENT)))
 endif
 
-.PHONY: all clean clean-dist clean-prod clean-outputs prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech image pdf $(BOM_FOLDER)/%.kibom
+.PHONY: all clean clean-dist clean-prod clean-outputs prod prod-gerber prod-pos prod-bom dist dist-mech dist-sch dist-pcb dist-ref gerbers pos bom sch pcb drill mech image image-lite pdf $(BOM_FOLDER)/%.kibom
 
 all: prod dist
 
@@ -316,6 +316,11 @@ drc: $(DRC_FILENAME)
 
 image: $(KICADMK_DIR)/Dockerfile
 	docker build --tag kicad-makefile:latest --label kicad-makefile $(KICADMK_DIR)/.
+
+# 'lite' image without bundled kicad footprints/symbols/3D models/templates;
+# mount user libraries/tables to /config, see README and docker-entrypoint.sh
+image-lite: $(KICADMK_DIR)/Dockerfile
+	docker build --build-arg KICAD_INSTALL_FLAGS=--no-install-recommends --tag kicad-makefile:lite --label kicad-makefile $(KICADMK_DIR)/.
 
 clean:
 	$(RM) $(OUTPUT_FOLDER)
